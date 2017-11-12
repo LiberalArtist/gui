@@ -539,13 +539,73 @@
   path-utils:generate-autosave-name
   (-> (or/c #f path-string? path-for-some-system?) path?)
   (filename)
-  @{Generates a name for an autosave file from @racket[filename].})
+  @{
+ Generates a path for an autosave file based on @racket[filename].
+
+ @index{'path-utils:autosave-dir}
+ The value of @racket[(preferences:get 'path-utils:autosave-dir)]
+ determines the directory of the resulting path.
+ When the preference value is @racket[#f] (the default),
+ result will use the same directory as the @racket[filename]
+ (or, when @racket[filename] is @racket[#f], the directory determined by
+ @racket[(find-system-path 'doc-dir)]).
+ Otherwise, when @racket[(preferences:get 'path-utils:autosave-dir)]
+ returns a path satisfying @racket[complete-path?] and
+ @racket[directory-exists?], the autosave file will be saved in
+ that directory.
+ A relative @racket[filename] will be resolved based on
+ the value of @racket[(current-directory)].
+
+ When @racket[filename] is @racket[#f], the final element of the
+ resulting path will be an automatically-generated unique name.
+ Otherwise, the final path element will be derived from @racket[filename].
+ When @racket[(preferences:get 'path-utils:autosave-dir)] returns
+ @racket[#f], the original file name will be used directly as the base;
+ otherwise, base will be the complete path to @racket[filename],
+ encoded by replacing each seperator (@litchar{\} on Windows or
+ @litchar{/} on Unix or Mac OS) with @litchar{!}.
+ This base is transformed into the final path element in a
+ platform-specific manner:
+ @itemlist[
+ @item{On Unix and Mac OS, a @litchar{#} is added to the start
+   and end of the file’s name, then a number is added after the
+   ending @litchar{#}, and then one more @litchar{#} is appended
+   after the number.
+   The number is selected to make the autosave filename unique.}
+ @item{On Windows, the file’s extension is replaced with a number
+   to make the autosave filename unique.}
+ ]})
 
  (proc-doc/names
   path-utils:generate-backup-name
   (path? . -> . path?)
   (filename)
-  @{Generates a name for an backup file from @racket[filename].})
+  @{
+ Generates a path for a backup file based on @racket[filename].
+
+ @index{'path-utils:backup-dir}
+ The value of @racket[(preferences:get 'path-utils:backup-dir)]
+ determines the directory of the resulting path in much the same
+ way as @racket[path-utils:generate-autosave-name] responds to
+ the preference  @racket['path-utils:autosave-dir]:
+ when the value is @racket[#f] (the default), the directory of
+ @racket[filename] is used, and otherwise the directory from the
+ preference is used.
+
+ The final element of the resulting path is generated from
+ @racket[filename] in a platform-specific manner:
+ @itemlist[
+ @item{On Unix and Mac OS, a @litchar{~} is added to the end
+   of the file’s name.}
+ @item{On Windows, the file’s extension is replaced
+   with @litchar{.bak}.}]
+ In either case, when @racket[(preferences:get 'path-utils:backup-dir)]
+ returns a non-false value, the result of the above transformation
+ is combined with the complete path of @racket[filename],
+ encoded by replacing seperators with @litchar{!} as with
+ @racket[path-utils:generate-autosave-name], to form the final
+ path element.
+ })
 
  (parameter-doc
   finder:dialog-parent-parameter
