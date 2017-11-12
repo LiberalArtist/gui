@@ -3,9 +3,8 @@
 (require "sig.rkt"
          "../preferences.rkt")
   
-(import framework:main^)
+(import)
 (export framework:path-utils^)
-(init-depend framework:main^)
 
 ;; preferences initialized in main.rkt
 
